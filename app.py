@@ -101,7 +101,7 @@ def main():
             st.write(f"Found {len(movies)} movies matching '{search_query}':")
             for i, row in df_movies.iterrows():
                 st.write(f"{row['title']} ({row['release_date']})")
-                display_movie_poster(row['poster_path'])
+                #display_movie_poster(row['poster_path'])
 
 # Run the app
 if __name__ == "__main__":
