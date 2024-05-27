@@ -64,22 +64,45 @@ def display_movie_poster(poster_path):
     # Display the image
     st.image(full_url)
 
+# Function to call the TMDb API and search for movies
+def search_movies_from_api(query):
+    url_search = "https://api.themoviedb.org/3/search/movie"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    params = {
+        "query": query
+    }
+    response = requests.get(url_search, headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    else:
+        st.error("Failed to search for movies from the API")
+        return []
+
 
 # Streamlit app layout
 def main():
     st.title("Movie Reviews Sentiment Analysis")
     
-    # Fetch movies from API
-    st.write("Fetching movies from TMDb API...")
-    movies = fetch_movies_from_api()
+     # Search for movies
+    search_query = st.text_input("Search for a movie")
 
-    if movies:
-        # Convert the movies data to a DataFrame
-        df_movies = pd.DataFrame(movies)
+    if search_query:
+        st.write(f"Searching for movies matching: {search_query}")
+        movies = search_movies_from_api(search_query)
 
-        # Show raw movie data
-        if st.checkbox("Show Raw Movie Data"):
-            st.write(df_movies)
+        if movies:
+            # Convert the movies data to a DataFrame
+            df_movies = pd.DataFrame(movies)
+
+            # Show search results
+            st.write(f"Found {len(movies)} movies matching '{search_query}':")
+            for i, row in df_movies.iterrows():
+                st.write(f"{row['title']} ({row['release_date']})")
+                display_movie_poster(row['poster_path'])
+        
         poster_path = df_movies.iloc[7]['poster_path']
         display_movie_poster(poster_path)
 
