@@ -35,6 +35,18 @@ def fetch_movies_from_api():
         st.error("Failed to fetch movies from the API")
         return []
 
+
+def display_movie_poster(poster_path):
+    base_url = 'https://image.tmdb.org/t/p/'
+    size = 'w500'  # You can adjust the size as needed
+
+    # Construct the full URL
+    full_url = f"{base_url}{size}{poster_path}"
+
+    # Display the image
+    st.image(full_url, use_column_width=True)
+
+
 # Streamlit app layout
 def main():
     st.title("Movie Reviews Sentiment Analysis")
@@ -50,6 +62,8 @@ def main():
         # Show raw movie data
         if st.checkbox("Show Raw Movie Data"):
             st.write(df_movies)
+            poster_path = df_movies[[1]].poster_path
+            display_movie_poster(poster_path)
 
 # Run the app
 if __name__ == "__main__":
