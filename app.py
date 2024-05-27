@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import requests
 from textblob import TextBlob
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
