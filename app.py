@@ -62,7 +62,7 @@ def display_movie_poster(poster_path):
     full_url = f"{base_url}{size}{poster_path}"
 
     # Display the image
-    st.image(full_url, use_column_width=True)
+    st.image(full_url)
 
 
 # Streamlit app layout
