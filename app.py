@@ -62,7 +62,7 @@ def main():
         # Show raw movie data
         if st.checkbox("Show Raw Movie Data"):
             st.write(df_movies)
-            poster_path = df_movies.iloc[0]['poster_path']
+            poster_path = df_movies.iloc[7]['poster_path']
             display_movie_poster(poster_path)
 
 # Run the app
