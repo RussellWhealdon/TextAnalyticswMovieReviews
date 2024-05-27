@@ -81,6 +81,20 @@ def search_movies_from_api(query):
         st.error("Failed to search for movies from the API")
         return []
 
+# Function to fetch movie details by movie ID
+def fetch_movie_details(movie_id):
+    url_movie = f"https://api.themoviedb.org/3/movie/{movie_id}"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url_movie, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error("Failed to fetch movie details from the API")
+        return None
+
 
 # Streamlit app layout
 def main():
@@ -97,12 +111,20 @@ def main():
             # Convert the movies data to a DataFrame
             df_movies = pd.DataFrame(movies)
 
-            # Show search results
-            st.write(f"Found {len(movies)} movies matching '{search_query}':")
-            for i, row in df_movies.iterrows():
-                st.write(f"{row['title']} ({row['release_date']})")
-                #display_movie_poster(row['poster_path'])
+            # Display dropdown for movie selection
+            movie_titles = df_movies['title'].tolist()
+            selected_movie_title = st.selectbox("Select a movie", movie_titles)
 
+            # Fetch details for the selected movie
+            selected_movie = df_movies[df_movies['title'] == selected_movie_title].iloc[0]
+            movie_details = fetch_movie_details(selected_movie['id'])
+
+            if movie_details:
+                # Display selected movie details
+                st.write(f"**Title**: {movie_details['title']}")
+                st.write(f"**Release Date**: {movie_details['release_date']}")
+                st.write(f"**Overview**: {movie_details['overview']}")
+                display_movie_poster(movie_details['poster_path'])
 # Run the app
 if __name__ == "__main__":
     main()
