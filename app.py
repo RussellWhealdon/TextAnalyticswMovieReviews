@@ -5,6 +5,24 @@ from textblob import TextBlob
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
 
+### Set Page config
+st.set_page_config(page_title= f"Text Analytics w/ Movie Reviews",page_icon="🧑‍🚀",layout="wide")
+
+### Set Background image
+page_bg_img = """
+<style>
+[data-testid="stAppViewContainer"]{
+background-image: url("https://source.unsplash.com/a-close-up-of-a-white-wall-with-wavy-lines-75xPHEQBmvA");
+background-size: cover;
+}
+</style>
+"""
+### Big title
+st.markdown(f"<h1 style='text-align: center;'>California Wildfire Damage Analysis</h1>", unsafe_allow_html=True)
+    
+### Introduction section
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 # Download necessary NLTK data
 nltk.download('vader_lexicon')
 
