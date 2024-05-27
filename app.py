@@ -20,18 +20,19 @@ def get_textblob_sentiment(text):
     blob = TextBlob(text)
     return blob.sentiment.polarity
 
-# Sample DataFrame (replace this with your actual data loading code)
-def load_data():
-    # For demonstration, we'll create a sample DataFrame
-    data = {
-        'movie_id': [1, 1, 2, 2, 3, 3],
-        'title': ['Movie One', 'Movie One', 'Movie Two', 'Movie Two', 'Movie Three', 'Movie Three'],
-        'CleanedText': [
-            'This movie was great!', 'I loved the movie.', 'Not my cup of tea.', 'Could have been better.', 'Awful movie.', 'Terrible experience.'
-        ]
+# Function to call the TMDb API and discover movies
+def fetch_movies_from_api():
+    url_discover = "https://api.themoviedb.org/3/discover/movie"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
     }
-    df = pd.DataFrame(data)
-    return df
+    response = requests.get(url_discover, headers=headers)
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    else:
+        st.error("Failed to fetch movies from the API")
+        return []
 
 # Streamlit app layout
 def main():
