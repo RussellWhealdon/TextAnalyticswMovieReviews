@@ -102,9 +102,6 @@ def main():
             for i, row in df_movies.iterrows():
                 st.write(f"{row['title']} ({row['release_date']})")
                 display_movie_poster(row['poster_path'])
-        
-        poster_path = df_movies.iloc[7]['poster_path']
-        display_movie_poster(poster_path)
 
 # Run the app
 if __name__ == "__main__":
