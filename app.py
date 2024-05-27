@@ -37,37 +37,18 @@ def fetch_movies_from_api():
 # Streamlit app layout
 def main():
     st.title("Movie Reviews Sentiment Analysis")
+    
+    # Fetch movies from API
+    st.write("Fetching movies from TMDb API...")
+    movies = fetch_movies_from_api()
 
-    # Load data
-    reviews = load_data()
+    if movies:
+        # Convert the movies data to a DataFrame
+        df_movies = pd.DataFrame(movies)
 
-    # Show raw data
-    if st.checkbox("Show Raw Data"):
-        st.write(reviews)
-
-    # Apply sentiment analysis
-    reviews['vader_sentiment'] = reviews['CleanedText'].apply(get_vader_sentiment)
-    reviews['textblob_sentiment'] = reviews['CleanedText'].apply(get_textblob_sentiment)
-
-    # Display sentiment scores
-    if st.checkbox("Show Sentiment Scores"):
-        st.write(reviews[['movie_id', 'title', 'CleanedText', 'vader_sentiment', 'textblob_sentiment']])
-
-    # Average sentiment by movie
-    average_sentiment = reviews.groupby('movie_id')['vader_sentiment'].mean().reset_index()
-    average_sentiment = average_sentiment.merge(reviews[['movie_id', 'title']].drop_duplicates(), on='movie_id')
-    average_sentiment.rename(columns={'vader_sentiment': 'average_sentiment'}, inplace=True)
-
-    # Display average sentiment scores
-    if st.checkbox("Show Average Sentiment Scores"):
-        st.write(average_sentiment.sort_values(by='average_sentiment', ascending=False))
-
-    # Review with the lowest sentiment
-    min_sentiment_index = reviews['vader_sentiment'].idxmin()
-    lowest_sentiment_review = reviews.loc[min_sentiment_index]
-
-    st.write("Review with the Lowest Sentiment")
-    st.write(lowest_sentiment_review)
+        # Show raw movie data
+        if st.checkbox("Show Raw Movie Data"):
+            st.write(df_movies)
 
 # Run the app
 if __name__ == "__main__":
