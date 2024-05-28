@@ -2,3 +2,5 @@ streamlit==1.35.0
 pandas==2.2.2
 textblob==0.18.0.post0
 nltk==3.8.1
+WordCloud==1.9.3
+matplotlib==3.9.0
