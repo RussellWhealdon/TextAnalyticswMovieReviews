@@ -151,6 +151,22 @@ def fetch_movie_reviews(movie_id):
         return []
 
 
+# Function to get the average score given to a movie by its ID
+def get_average_score(movie_id):
+    url_movie = f"https://api.themoviedb.org/3/movie/{movie_id}"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url_movie, headers=headers)
+    if response.status_code == 200:
+        movie_details = response.json()
+        return movie_details.get('vote_average', 0)  # Return the average score, default to 0 if not found
+    else:
+        st.error("Failed to fetch movie details from the API")
+        return None
+
+
 # Streamlit app layout
 def main():
     st.title("Movie Reviews Sentiment Analysis")
@@ -179,6 +195,7 @@ def main():
                 st.write(f"**Title**: {movie_details['title']}")
                 st.write(f"**Release Date**: {movie_details['release_date']}")
                 st.write(f"**Overview**: {movie_details['overview']}")
+                st.write(movie_details)
                 display_movie_poster(movie_details['poster_path'])
 
                              # Fetch reviews for the selected movie
