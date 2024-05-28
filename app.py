@@ -207,9 +207,9 @@ def main():
                 st.write(f"**Release Date**: {movie_details['release_date']}")
                 st.write(f"**Overview**: {movie_details['overview']}")
                 st.write(movie_details['vote_average'])
-                display_movie_poster(movie_details['poster_path'])
+                
 
-                             # Fetch reviews for the selected movie
+                # Fetch reviews for the selected movie
                 reviews = fetch_movie_reviews(selected_movie['id'])
             if reviews:
                 df_reviews = pd.DataFrame(reviews)
@@ -239,6 +239,9 @@ def main():
                 col2.metric("Number of Reviews", num_reviews)
                 col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
                 col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
+
+                #display poster
+                display_movie_poster(movie_details['poster_path'])
 
 # Run the app
 if __name__ == "__main__":
