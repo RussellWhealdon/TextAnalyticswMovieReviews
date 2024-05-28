@@ -8,6 +8,8 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 # Download necessary NLTK data
 nltk.download('vader_lexicon')
@@ -166,6 +168,15 @@ def get_average_score(movie_id):
         st.error("Failed to fetch movie details from the API")
         return None
 
+# Function to generate and display a word cloud from a given text.
+def generate_wordcloud(text):
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+    # Display the word cloud using matplotlib
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    plt.show()
+
 
 # Streamlit app layout
 def main():
@@ -222,6 +233,9 @@ def main():
                     min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
                     lowest_sentiment_review = df_reviews.loc[min_sentiment_index]
 
+                    all_cleaned_text = ' '.join(df_reviews['CleanedText'])
+                    generate_wordcloud(all_cleaned_text)
+                    
                     st.write("Review with the Lowest Sentiment")
                     st.write(lowest_sentiment_review)
                 else:
