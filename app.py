@@ -250,6 +250,17 @@ def main():
                     all_cleaned_text = ' '.join(df_reviews['CleanedText'])
                     generate_wordcloud(all_cleaned_text)
 
+                # Review sorting options
+                sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"])
+                if sort_order == "Highest Reviews":
+                    df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=False)
+                else:
+                    df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=True)
+
+                # Display the DataFrame of reviews
+                st.dataframe(df_reviews[['author', 'CleanedText', 'vader_sentiment', 'textblob_sentiment']])
+
+
                 
 
 # Run the app
