@@ -235,7 +235,7 @@ def main():
 
                 # Create scorecards
                 col1, col2, col3, col4 = st.columns(4)
-                col1.metric("Average Score", f"{average_score:.2f}")
+                col1.metric("Average Rating", f"{average_score:.2f}")
                 col2.metric("Number of Reviews", num_reviews)
                 col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
                 col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
