@@ -2,8 +2,18 @@ import streamlit as st
 import pandas as pd
 import requests
 from textblob import TextBlob
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+# Download necessary NLTK data
+nltk.download('vader_lexicon')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 ### Set Page config
 st.set_page_config(page_title= f"Text Analytics w/ Movie Reviews",page_icon="🧑‍🚀",layout="wide")
@@ -25,6 +35,24 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Download necessary NLTK data
 nltk.download('vader_lexicon')
+
+# Function to clean the text
+def clean_text(text):
+    # Remove special characters and numbers, convert to lowercase
+    text = ''.join(char.lower() if char.isalpha() or char.isspace() else ' ' for char in text)
+
+    # Tokenize the text
+    tokens = word_tokenize(text)
+
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [word for word in tokens if word not in stop_words]
+
+    # Lemmatization
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(word) for word in tokens]
+
+    return ' '.join(tokens)  # Join tokens back into a single string
 
 # Initialize VADER sentiment analyzer
 sid = SentimentIntensityAnalyzer()
@@ -52,6 +80,20 @@ def fetch_movies_from_api():
     else:
         st.error("Failed to fetch movies from the API")
         return []
+
+# Function to fetch movie details by movie ID
+def fetch_movie_details(movie_id):
+    url_movie = f"https://api.themoviedb.org/3/movie/{movie_id}"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url_movie, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error("Failed to fetch movie details from the API")
+        return None
 
 
 def display_movie_poster(poster_path):
@@ -94,6 +136,19 @@ def fetch_movie_details(movie_id):
     else:
         st.error("Failed to fetch movie details from the API")
         return None
+# Function to get reviews for a movie ID
+def fetch_movie_reviews(movie_id):
+    url_reviews = f"https://api.themoviedb.org/3/movie/{movie_id}/reviews"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url_reviews, headers=headers)
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    else:
+        st.error("Failed to fetch movie reviews from the API")
+        return []
 
 
 # Streamlit app layout
@@ -125,6 +180,43 @@ def main():
                 st.write(f"**Release Date**: {movie_details['release_date']}")
                 st.write(f"**Overview**: {movie_details['overview']}")
                 display_movie_poster(movie_details['poster_path'])
+
+                             # Fetch reviews for the selected movie
+                reviews = fetch_movie_reviews(selected_movie['id'])
+                if reviews:
+                    df_reviews = pd.DataFrame(reviews)
+
+                    # Extract review content
+                    df_reviews['CleanedText'] = df_reviews['content'].apply(clean_text)
+
+                    # Apply sentiment analysis
+                    df_reviews['vader_sentiment'] = df_reviews['CleanedText'].apply(get_vader_sentiment)
+                    df_reviews['textblob_sentiment'] = df_reviews['CleanedText'].apply(get_textblob_sentiment)
+
+                    # Display sentiment scores
+                    if st.checkbox("Show Sentiment Scores"):
+                        st.write(df_reviews[['author', 'CleanedText', 'vader_sentiment', 'textblob_sentiment']])
+
+                    # Average sentiment
+                    average_sentiment = df_reviews['vader_sentiment'].mean()
+                    st.write(f"Average Sentiment: {average_sentiment}")
+
+                    # Review with the lowest sentiment
+                    min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
+                    lowest_sentiment_review = df_reviews.loc[min_sentiment_index]
+
+                    st.write("Review with the Lowest Sentiment")
+                    st.write(lowest_sentiment_review)
+                else:
+                    st.write("No reviews found")
+            else:
+                st.write("No movie details to display")
+        else:
+            st.write("No movies found")
+    else:
+        st.write("Enter a movie title to search")
+
+
 # Run the app
 if __name__ == "__main__":
     main()
