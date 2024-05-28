@@ -195,7 +195,7 @@ def main():
                 st.write(f"**Title**: {movie_details['title']}")
                 st.write(f"**Release Date**: {movie_details['release_date']}")
                 st.write(f"**Overview**: {movie_details['overview']}")
-                st.write(pd.DataFrame(movie_details))
+                st.write(movie_details['vote_average'])
                 display_movie_poster(movie_details['poster_path'])
 
                              # Fetch reviews for the selected movie
