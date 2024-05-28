@@ -240,8 +240,17 @@ def main():
                 col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
                 col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
 
-                #display poster
-                display_movie_poster(movie_details['poster_path'])
+                col5, col6 = st.columns(2)
+                with col5:
+                    # Display poster
+                    display_movie_poster(movie_details['poster_path'])
+
+                with col6:
+                    # Display wordcloud
+                    all_cleaned_text = ' '.join(df_reviews['CleanedText'])
+                    generate_wordcloud(all_cleaned_text)
+
+                
 
 # Run the app
 if __name__ == "__main__":
