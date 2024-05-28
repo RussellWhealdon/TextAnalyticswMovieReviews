@@ -175,7 +175,7 @@ def generate_wordcloud(text):
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    plt.show()
+    st.pyplot(plt)
 
 
 # Streamlit app layout
