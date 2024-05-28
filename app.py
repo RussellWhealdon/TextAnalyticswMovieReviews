@@ -211,42 +211,34 @@ def main():
 
                              # Fetch reviews for the selected movie
                 reviews = fetch_movie_reviews(selected_movie['id'])
-                if reviews:
-                    df_reviews = pd.DataFrame(reviews)
+            if reviews:
+                df_reviews = pd.DataFrame(reviews)
 
-                    # Extract review content
-                    df_reviews['CleanedText'] = df_reviews['content'].apply(clean_text)
+                # Extract review content
+                df_reviews['CleanedText'] = df_reviews['content'].apply(clean_text)
 
-                    # Apply sentiment analysis
-                    df_reviews['vader_sentiment'] = df_reviews['CleanedText'].apply(get_vader_sentiment)
-                    df_reviews['textblob_sentiment'] = df_reviews['CleanedText'].apply(get_textblob_sentiment)
+                # Apply sentiment analysis
+                df_reviews['vader_sentiment'] = df_reviews['CleanedText'].apply(get_vader_sentiment)
+                df_reviews['textblob_sentiment'] = df_reviews['CleanedText'].apply(get_textblob_sentiment)
 
-                    # Display sentiment scores
-                    if st.checkbox("Show Sentiment Scores"):
-                        st.write(df_reviews[['author', 'CleanedText', 'vader_sentiment', 'textblob_sentiment']])
+                # Average score for the movie
+                average_score = get_average_score(selected_movie['id'])
 
-                    # Average sentiment
-                    average_sentiment = df_reviews['vader_sentiment'].mean()
-                    st.write(f"Average Sentiment: {average_sentiment}")
+                # Number of reviews
+                num_reviews = len(df_reviews)
 
-                    # Review with the lowest sentiment
-                    min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
-                    lowest_sentiment_review = df_reviews.loc[min_sentiment_index]
+                # Average sentiment
+                average_sentiment = df_reviews['vader_sentiment'].mean()
+            
+                # Lowest sentiment score
+                lowest_sentiment = df_reviews['vader_sentiment'].min()
 
-                    all_cleaned_text = ' '.join(df_reviews['CleanedText'])
-                    generate_wordcloud(all_cleaned_text)
-                    
-                    st.write("Review with the Lowest Sentiment")
-                    st.write(lowest_sentiment_review)
-                else:
-                    st.write("No reviews found")
-            else:
-                st.write("No movie details to display")
-        else:
-            st.write("No movies found")
-    else:
-        st.write("Enter a movie title to search")
-
+                # Create scorecards
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("Average Score", f"{average_score:.2f}")
+                col2.metric("Number of Reviews", num_reviews)
+                col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
+                col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
 
 # Run the app
 if __name__ == "__main__":
