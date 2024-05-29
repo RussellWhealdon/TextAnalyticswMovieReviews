@@ -206,9 +206,9 @@ def main():
                 st.write(f"**Title**: {movie_details['title']}")
                 st.write(f"**Release Date**: {movie_details['release_date']}")
                 st.write(f"**Overview**: {movie_details['overview']}")
-                st.write(movie_details['vote_average'])
 
-                st.write(movie_details)
+                with st.expander("Full JSON"):
+                    st.write(movie_details)
 
                 # Fetch reviews for the selected movie
                 reviews = fetch_movie_reviews(selected_movie['id'])
@@ -225,6 +225,8 @@ def main():
                 # Average score for the movie
                 average_score = get_average_score(selected_movie['id'])
 
+                vote_count = movie_details['vote_count']
+
                 # Number of reviews
                 num_reviews = len(df_reviews)
 
@@ -237,9 +239,9 @@ def main():
                 # Create scorecards
                 col1, col2, col3, col4 = st.columns(4)
                 col1.metric("Average Rating", f"{average_score:.2f}")
-                col2.metric("Number of Reviews", num_reviews)
-                col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
-                col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
+                col2.metric("Vote Count", vote_count)
+                col3.metric("Number of Reviews", num_reviews)
+                col4.metric("Average Sentiment", f"{average_sentiment:.2f}")
 
                 col5, col6 = st.columns(2)
                 with col5:
