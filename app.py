@@ -207,7 +207,8 @@ def main():
                 st.write(f"**Release Date**: {movie_details['release_date']}")
                 st.write(f"**Overview**: {movie_details['overview']}")
                 st.write(movie_details['vote_average'])
-                
+
+                st.write(movie_details)
 
                 # Fetch reviews for the selected movie
                 reviews = fetch_movie_reviews(selected_movie['id'])
