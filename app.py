@@ -181,87 +181,84 @@ def generate_wordcloud(text):
 # Streamlit app layout
 def main():
     st.title("Movie Reviews Sentiment Analysis")
+    with st.expander("Search for movies and see reviews"):
+        # Search for movies
+        search_query = st.text_input("Search for a movie")
+        if search_query:
+            st.write(f"Searching for movies matching: {search_query}")
+            movies = search_movies_from_api(search_query)
+        
+            if movies:
+                # Convert the movies data to a DataFrame
+                df_movies = pd.DataFrame(movies)
+        
+                # Display dropdown for movie selection
+                movie_titles = df_movies['title'].tolist()
+                selected_movie_title = st.selectbox("Select a movie", movie_titles)
+        
+                # Fetch details for the selected movie
+                selected_movie = df_movies[df_movies['title'] == selected_movie_title].iloc[0]
+                movie_details = fetch_movie_details(selected_movie['id'])
+        
+                if movie_details:
+                    # Display selected movie details
+                    st.write(f"**Title**: {movie_details['title']}")
+                    st.write(f"**Release Date**: {movie_details['release_date']}")
+                    st.write(f"**Overview**: {movie_details['overview']}")
     
-     # Search for movies
-    search_query = st.text_input("Search for a movie")
-
-    if search_query:
-        st.write(f"Searching for movies matching: {search_query}")
-        movies = search_movies_from_api(search_query)
-
-        if movies:
-            # Convert the movies data to a DataFrame
-            df_movies = pd.DataFrame(movies)
-
-            # Display dropdown for movie selection
-            movie_titles = df_movies['title'].tolist()
-            selected_movie_title = st.selectbox("Select a movie", movie_titles)
-
-            # Fetch details for the selected movie
-            selected_movie = df_movies[df_movies['title'] == selected_movie_title].iloc[0]
-            movie_details = fetch_movie_details(selected_movie['id'])
-
-            if movie_details:
-                # Display selected movie details
-                st.write(f"**Title**: {movie_details['title']}")
-                st.write(f"**Release Date**: {movie_details['release_date']}")
-                st.write(f"**Overview**: {movie_details['overview']}")
-
-                with st.expander("Full JSON"):
-                    st.write(movie_details)
-
-                # Fetch reviews for the selected movie
-                reviews = fetch_movie_reviews(selected_movie['id'])
-            if reviews:
-                df_reviews = pd.DataFrame(reviews)
-
-                # Extract review content
-                df_reviews['CleanedText'] = df_reviews['content'].apply(clean_text)
-
-                # Apply sentiment analysis
-                df_reviews['vader_sentiment'] = df_reviews['CleanedText'].apply(get_vader_sentiment)
-                df_reviews['textblob_sentiment'] = df_reviews['CleanedText'].apply(get_textblob_sentiment)
-
-                # Average score for the movie
-                average_score = get_average_score(selected_movie['id'])
-
-                vote_count = movie_details['vote_count']
-
-                # Number of reviews
-                num_reviews = len(df_reviews)
-
-                # Average sentiment
-                average_sentiment = df_reviews['vader_sentiment'].mean()
-            
-                # Lowest sentiment score
-                lowest_sentiment = df_reviews['vader_sentiment'].min()
-
-                # Create scorecards
-                col1, col2, col3, col4 = st.columns(4)
-                col1.metric("Average Rating", f"{average_score:.2f}")
-                col2.metric("Vote Count", vote_count)
-                col3.metric("Number of Reviews", num_reviews)
-                col4.metric("Average Sentiment", f"{average_sentiment:.2f}")
-
-                col5, col6 = st.columns(2)
-                with col5:
-                    # Display poster
-                    display_movie_poster(movie_details['poster_path'])
-
-                with col6:
-                    # Display wordcloud
-                    all_cleaned_text = ' '.join(df_reviews['CleanedText'])
-                    generate_wordcloud(all_cleaned_text)
-
-                # Review sorting options
-                sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"])
-                if sort_order == "Highest Reviews":
-                    df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=False)
-                else:
-                    df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=True)
-
-                # Display the DataFrame of reviews
-                st.dataframe(df_reviews[['author', 'content', 'vader_sentiment', 'textblob_sentiment']])
+        
+                    # Fetch reviews for the selected movie
+                    reviews = fetch_movie_reviews(selected_movie['id'])
+                if reviews:
+                    df_reviews = pd.DataFrame(reviews)
+        
+                    # Extract review content
+                    df_reviews['CleanedText'] = df_reviews['content'].apply(clean_text)
+        
+                    # Apply sentiment analysis
+                    df_reviews['vader_sentiment'] = df_reviews['CleanedText'].apply(get_vader_sentiment)
+                    df_reviews['textblob_sentiment'] = df_reviews['CleanedText'].apply(get_textblob_sentiment)
+        
+                    # Average score for the movie
+                    average_score = get_average_score(selected_movie['id'])
+        
+                    vote_count = movie_details['vote_count']
+        
+                    # Number of reviews
+                    num_reviews = len(df_reviews)
+        
+                    # Average sentiment
+                    average_sentiment = df_reviews['vader_sentiment'].mean()
+                
+                    # Lowest sentiment score
+                    lowest_sentiment = df_reviews['vader_sentiment'].min()
+        
+                    # Create scorecards
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Average Rating", f"{average_score:.2f}")
+                    col2.metric("Vote Count", vote_count)
+                    col3.metric("Number of Reviews", num_reviews)
+                    col4.metric("Average Sentiment", f"{average_sentiment:.2f}")
+        
+                    col5, col6 = st.columns(2)
+                    with col5:
+                        # Display poster
+                        display_movie_poster(movie_details['poster_path'])
+        
+                    with col6:
+                        # Display wordcloud
+                        all_cleaned_text = ' '.join(df_reviews['CleanedText'])
+                        generate_wordcloud(all_cleaned_text)
+        
+                    # Review sorting options
+                    sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"])
+                    if sort_order == "Highest Reviews":
+                        df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=False)
+                    else:
+                        df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=True)
+        
+                    # Display the DataFrame of reviews
+                    st.dataframe(df_reviews[['author', 'content', 'vader_sentiment', 'textblob_sentiment']])
 
 
                 
