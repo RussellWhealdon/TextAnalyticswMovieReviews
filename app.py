@@ -221,7 +221,7 @@ def main():
     st.title("Movie Reviews Sentiment Analysis")
 
     # Option to select type of movie list
-    movie_list_type = st.selectbox("Select movie list type", ["Popular", "Top Rated", "Latest"])
+    movie_list_type = st.selectbox("Select movie list type", ["Popular", "Top Rated"])
 
     if movie_list_type == "Popular":
         st.write("Fetching popular movies...")
@@ -229,9 +229,6 @@ def main():
     elif movie_list_type == "Top Rated":
         st.write("Fetching top-rated movies...")
         movies = fetch_top_rated_movies()
-    elif movie_list_type == "Latest":
-        st.write("Fetching the latest movie...")
-        movies = fetch_latest_movies()
 
     if movies:
         # Convert the movies data to a DataFrame
