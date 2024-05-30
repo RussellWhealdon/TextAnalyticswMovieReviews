@@ -261,7 +261,8 @@ def main():
                     st.dataframe(df_reviews[['author', 'content', 'vader_sentiment', 'textblob_sentiment']])
 
 
-                
+    with st.expander("Get recommendations for movies you might like:"):
+        st.write("Build in progress...")
 
 # Run the app
 if __name__ == "__main__":
