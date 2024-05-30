@@ -177,10 +177,147 @@ def generate_wordcloud(text):
     plt.axis('off')
     st.pyplot(plt)
 
+def fetch_popular_movies():
+    url = "https://api.themoviedb.org/3/movie/popular"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    else:
+        st.error("Failed to fetch popular movies from the API")
+        return []
+
+def fetch_top_rated_movies():
+    url = "https://api.themoviedb.org/3/movie/top_rated"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    else:
+        st.error("Failed to fetch top-rated movies from the API")
+        return []
+
+def fetch_latest_movies():
+    url = "https://api.themoviedb.org/3/movie/latest"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {st.secrets['tmdb']['bearer_token']}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return [response.json()]  # Latest movie endpoint returns a single movie object
+    else:
+        st.error("Failed to fetch latest movie from the API")
+        return []
+
 
 # Streamlit app layout
 def main():
     st.title("Movie Reviews Sentiment Analysis")
+
+    # Option to select type of movie list
+    movie_list_type = st.selectbox("Select movie list type", ["Popular", "Top Rated", "Latest"])
+
+    if movie_list_type == "Popular":
+        st.write("Fetching popular movies...")
+        movies = fetch_popular_movies()
+    elif movie_list_type == "Top Rated":
+        st.write("Fetching top-rated movies...")
+        movies = fetch_top_rated_movies()
+    elif movie_list_type == "Latest":
+        st.write("Fetching the latest movie...")
+        movies = fetch_latest_movies()
+
+    if movies:
+        # Convert the movies data to a DataFrame
+        df_movies = pd.DataFrame(movies)
+
+        # Display dropdown for movie selection
+        movie_titles = df_movies['title'].tolist()
+        selected_movie_title = st.selectbox("Select a movie", movie_titles)
+
+        # Fetch details for the selected movie
+        selected_movie = df_movies[df_movies['title'] == selected_movie_title].iloc[0]
+        movie_details = fetch_movie_details(selected_movie['id'])
+
+        if movie_details:
+            # Display selected movie details
+            st.write(f"**Title**: {movie_details['title']}")
+            st.write(f"**Release Date**: {movie_details['release_date']}")
+            st.write(f"**Overview**: {movie_details['overview']}")
+            display_movie_poster(movie_details['poster_path'])
+
+            # Fetch reviews for the selected movie
+            reviews = fetch_movie_reviews(selected_movie['id'])
+            if reviews:
+                df_reviews = pd.DataFrame(reviews)
+
+                # Extract review content
+                df_reviews['CleanedText'] = df_reviews['content'].apply(clean_text)
+
+                # Apply sentiment analysis
+                df_reviews['vader_sentiment'] = df_reviews['CleanedText'].apply(get_vader_sentiment)
+                df_reviews['textblob_sentiment'] = df_reviews['CleanedText'].apply(get_textblob_sentiment)
+
+                # Average score for the movie
+                average_score = get_average_score(selected_movie['id'])
+
+                # Number of reviews
+                num_reviews = len(df_reviews)
+
+                # Average sentiment
+                average_sentiment = df_reviews['vader_sentiment'].mean()
+
+                # Lowest sentiment score
+                lowest_sentiment = df_reviews['vader_sentiment'].min()
+
+                # Create scorecards
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("Average Score", f"{average_score:.2f}")
+                col2.metric("Number of Reviews", num_reviews)
+                col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
+                col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
+
+                # Review sorting options
+                sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"])
+                if sort_order == "Highest Reviews":
+                    df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=False)
+                else:
+                    df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=True)
+
+                # Display the DataFrame of reviews with wide layout
+                st.dataframe(df_reviews[['author', 'CleanedText', 'vader_sentiment', 'textblob_sentiment']], use_container_width=True)
+
+                # Review with the lowest sentiment
+                min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
+                lowest_sentiment_review = df_reviews.loc[min_sentiment_index]
+
+                st.write("Review with the Lowest Sentiment")
+                st.write(lowest_sentiment_review)
+
+                # Generate and display word cloud
+                if st.checkbox("Show Word Cloud"):
+                    all_cleaned_text = ' '.join(df_reviews['CleanedText'])
+                    generate_wordcloud(all_cleaned_text)
+            else:
+                st.write("No reviews found")
+            
+            # Get and display the average score for the movie
+            average_score = get_average_score(selected_movie['id'])
+            st.write(f"Average Score for {selected_movie_title}: {average_score}")
+        else:
+            st.write("No movie details to display")
+    else:
+        st.write("No movies found")
+
+
+    ### Allow users to search for movies
     with st.expander("Search for movies and see reviews"):
         # Search for movies
         search_query = st.text_input("Search for a movie")
