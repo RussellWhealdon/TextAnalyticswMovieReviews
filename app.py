@@ -275,7 +275,7 @@ def main():
                 # Create scorecards
                 col1, col2, col3, col4 = st.columns(4)
                 col1.metric("Average Score", f"{average_score:.2f}")
-                col2.metric("Number of Votes", f"{popular_vote_count.astype(int):.2f}")
+                col2.metric("Number of Votes", popular_vote_count.astype(int))
                 col3.metric("Number of Reviews", num_reviews)
                 col4.metric("Average Sentiment", f"{average_sentiment:.2f}")
 
