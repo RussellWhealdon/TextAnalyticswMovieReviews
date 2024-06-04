@@ -389,7 +389,7 @@ def main():
                         df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=True)
         
                     # Display the DataFrame of reviews
-                    st.dataframe(df_reviews[['author', 'content', 'vader_sentiment', 'textblob_sentiment']])
+                    st.dataframe(df_reviews[['author', 'content', 'vader_sentiment', 'textblob_sentiment']], use_container_width=True)
 
 
     with st.expander("Get recommendations for movies you might like:"):
