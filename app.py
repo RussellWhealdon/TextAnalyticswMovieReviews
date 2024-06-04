@@ -270,14 +270,14 @@ def main():
                 average_sentiment = df_reviews['vader_sentiment'].mean()
 
                 # Lowest sentiment score
-                lowest_sentiment = df_reviews['vader_sentiment'].min()
+                poular_vote_count = selected_movie['vote_count']
 
                 # Create scorecards
                 col1, col2, col3, col4 = st.columns(4)
                 col1.metric("Average Score", f"{average_score:.2f}")
-                col2.metric("Number of Reviews", num_reviews)
-                col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
-                col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
+                col2.metric("Number of Votes", f"{poular_vote_count:.2f}")
+                col3.metric("Number of Reviews", num_reviews)
+                col4.metric("Average Sentiment", f"{average_sentiment:.2f}")
 
                 col5, col6 = st.columns(2)
                 with col5:
