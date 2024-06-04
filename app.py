@@ -382,7 +382,7 @@ def main():
                         generate_wordcloud(all_cleaned_text)
         
                     # Review sorting options
-                    sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"])
+                    sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"], key = "Search sort")
                     if sort_order == "Highest Reviews":
                         df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=False)
                     else:
