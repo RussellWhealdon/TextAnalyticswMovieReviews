@@ -247,7 +247,6 @@ def main():
             st.write(f"**Title**: {movie_details['title']}")
             st.write(f"**Release Date**: {movie_details['release_date']}")
             st.write(f"**Overview**: {movie_details['overview']}")
-            display_movie_poster(movie_details['poster_path'])
 
             # Fetch reviews for the selected movie
             reviews = fetch_movie_reviews(selected_movie['id'])
@@ -280,6 +279,15 @@ def main():
                 col3.metric("Average Sentiment", f"{average_sentiment:.2f}")
                 col4.metric("Lowest Sentiment", f"{lowest_sentiment:.2f}")
 
+                col5, col6 = st.columns(2)
+                with col5:
+                    display_movie_poster(movie_details['poster_path'])
+                    
+                # Generate and display word cloud
+                all_cleaned_text = ' '.join(df_reviews['CleanedText'])
+                with col6:
+                    generate_wordcloud(all_cleaned_text)
+
                 # Review sorting options
                 sort_order = st.selectbox("Sort reviews by", ["Highest Reviews", "Lowest Reviews"])
                 if sort_order == "Highest Reviews":
@@ -294,10 +302,6 @@ def main():
                 min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
                 lowest_sentiment_review = df_reviews.loc[min_sentiment_index]
 
-                # Generate and display word cloud
-                if st.checkbox("Show Word Cloud"):
-                    all_cleaned_text = ' '.join(df_reviews['CleanedText'])
-                    generate_wordcloud(all_cleaned_text)
             else:
                 st.write("No reviews found")
             
@@ -361,18 +365,18 @@ def main():
                     lowest_sentiment = df_reviews['vader_sentiment'].min()
         
                     # Create scorecards
-                    col1, col2, col3, col4 = st.columns(4)
-                    col1.metric("Average Rating", f"{average_score:.2f}")
-                    col2.metric("Vote Count", vote_count)
-                    col3.metric("Number of Reviews", num_reviews)
-                    col4.metric("Average Sentiment", f"{average_sentiment:.2f}")
+                    col7, col8, col9, col10 = st.columns(4)
+                    col7.metric("Average Rating", f"{average_score:.2f}")
+                    col8.metric("Vote Count", vote_count)
+                    col9.metric("Number of Reviews", num_reviews)
+                    col10.metric("Average Sentiment", f"{average_sentiment:.2f}")
         
-                    col5, col6 = st.columns(2)
-                    with col5:
+                    col11, col12 = st.columns(2)
+                    with col11:
                         # Display poster
                         display_movie_poster(movie_details['poster_path'])
         
-                    with col6:
+                    with col12:
                         # Display wordcloud
                         all_cleaned_text = ' '.join(df_reviews['CleanedText'])
                         generate_wordcloud(all_cleaned_text)
