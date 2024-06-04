@@ -296,7 +296,7 @@ def main():
                     df_reviews = df_reviews.sort_values(by="vader_sentiment", ascending=True)
 
                 # Display the DataFrame of reviews with wide layout
-                st.dataframe(df_reviews[['author', 'CleanedText', 'vader_sentiment', 'textblob_sentiment']], use_container_width=True)
+                st.dataframe(df_reviews[['author', 'content', 'vader_sentiment', 'textblob_sentiment']], use_container_width=True)
 
                 # Review with the lowest sentiment
                 min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
