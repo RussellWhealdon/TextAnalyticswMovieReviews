@@ -294,9 +294,6 @@ def main():
                 min_sentiment_index = df_reviews['vader_sentiment'].idxmin()
                 lowest_sentiment_review = df_reviews.loc[min_sentiment_index]
 
-                st.write("Review with the Lowest Sentiment")
-                st.write(lowest_sentiment_review)
-
                 # Generate and display word cloud
                 if st.checkbox("Show Word Cloud"):
                     all_cleaned_text = ' '.join(df_reviews['CleanedText'])
@@ -304,9 +301,6 @@ def main():
             else:
                 st.write("No reviews found")
             
-            # Get and display the average score for the movie
-            average_score = get_average_score(selected_movie['id'])
-            st.write(f"Average Score for {selected_movie_title}: {average_score}")
         else:
             st.write("No movie details to display")
     else:
